@@ -1,7 +1,7 @@
 import collections
 import re
 from pathlib import Path
-from typing import Callable, Dict, Iterable, List, Tuple, Union
+from typing import Callable, Dict, Iterable, List, Literal, Tuple, Union
 
 import pandas as pd
 import pendulum
@@ -77,7 +77,10 @@ class CimXmlBase:
             "mrid": attrib(node, "about", rdf),
         }
 
-    def _adder(self, profile: str) -> Callable:
+    def _adder(
+        self,
+        profile: Literal["SvVoltage", "SvTapStep", "TopologicalNode", "Terminal", "SvPowerFlow"],
+    ) -> Callable:
         try:
             return {
                 "SvVoltage": self._sv_voltage_data_adder,
@@ -86,10 +89,13 @@ class CimXmlBase:
                 "Terminal": self._terminal_data_adder,
                 "SvPowerFlow": self._sv_power_flow_data_adder,
             }[profile]
-        except KeyError:  # pragma: no cover
-            raise NotImplementedError(f"Not implememted adder for {profile}")
+        except KeyError as exc:  # pragma: no cover
+            raise NotImplementedError(f"Not implememted adder for {profile}") from exc
 
-    def parse(self, profile: str) -> pd.DataFrame:
+    def parse(
+        self,
+        profile: Literal["SvVoltage", "SvTapStep", "TopologicalNode", "Terminal", "SvPowerFlow"],
+    ) -> pd.DataFrame:
         """Parse SVTP xml str
 
         Args:

@@ -1,8 +1,7 @@
-"""The cimsparql.model module contains the base class CimModel for both graphdb.GraphDBClient with
-function get_table as well as a set of predefined CIM queries.
-"""
+"""The cimsparql.model module contains the base class CimModel."""
 
 import re
+from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Dict, Iterable, List, Optional, Tuple, TypeVar, Union
 
@@ -19,16 +18,20 @@ from cimsparql.url import Prefix
 CimModelType = TypeVar("CimModelType", bound="CimModel")
 
 
-class CimModel(Prefix):
-    """Used to query with sparql queries (typically CIM)"""
+class CimModel(Prefix, ABC):
+    """Used to query with sparql queries (typically CIM)."""
 
     def __init__(self, mapper: TypeMapper, *args, **kwargs) -> None:
         self._setup_client(*args, **kwargs)
         self.mapper = mapper
 
+    @abstractmethod
+    def _setup_client(self, *args, **kwargs):
+        pass
+
     @property
     def date_version(self) -> datetime:
-        """Activation date for this repository"""
+        """Activation date for this repository."""
         try:
             date_version = self._date_version
         except AttributeError:
