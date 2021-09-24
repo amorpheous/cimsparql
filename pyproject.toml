@@ -5,23 +5,32 @@
 # verbose regular expressions by Black.  Use [ ] to denote a significant space
 # character.
 [tool.poetry]
-name = "cimsparql"
-version = "1.8.0"
-description = "CIM query utilities"
-readme = "README.md"
+name = "abot_opf"
+version = "0.0.0"
+description = "Python library for running optimal dc power flow and bid filtering"
 authors = ["Statnett Datascience <Datascience.Drift@Statnett.no>"]
-repository = "https://github.com/statnett/cimsparql.git"
+repository = "https://gitlab.statnett.no/abot/opf.git"
+
+[[tool.poetry.source]]
+name = "artifactory"
+url = "https://artifactory.fifty.eu/artifactory/api/pypi/pypi/simple/"
+default = true
 
 [tool.poetry.dependencies]
-python = "^3.7"
+bigsql = "*"
+cimsparql = "*"
+entsoe = "*"
+networkx = "*"
 numpy = "*"
 pandas = "*"
+pendulum = "*"
+ptcpy = "*"
+python = "^3.8"
+scipy = "*"
 tables = "*"
-networkx = "*"
-SPARQLWrapper = "*"
-requests = "*"
-pendulum = {version = "*", optional = true}
-lxml = {version = "*", optional = true}
+validators = "*"
+xpress = "~8.11.3"
+logging-extra = "*"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "*"
@@ -29,19 +38,66 @@ black = { version = "*", allow-prereleases = true }
 coverage = { version = "*", extras = ['toml'] }
 flake8 = "*"
 flake8-bugbear = "*"
-isort = "*"
-lxml = "*"
+flake8-builtins = "*"
+flake8-comprehensions = "*"
+flake8-debugger = "*"
+flake8-eradicate = "*"
+flake8-mutable = "*"
+flake8-simplify = "*"
+flakehell = "*"
+ipython = "*"
+isort = ">= 5"
 mock = "*"
-pendulum = "*"
+mypy-ls = "*"
 pre-commit = "*"
-pylint = "*"
 pytest = ">= 6"
 pytest-cov = "*"
 pytest-integration = "*"
-pytest-profiling = "*"
-sphinx_autodoc_typehints = ["*"]
-sphinx_rtd_theme = ["*"]
-recommonmark = ["*"]
+python-lsp-server = { version = "*", extras = ['all'] }
+pyls-memestra = "*"
+pyls-flake8 = "*"
+testcontainers = "*"
+vulture = "*"
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["ptcpy", "cimsparql", "entsoe", "bigsql"]
+
+[tool.black]
+line-length = 100
+target-version = ["py37", "py38"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | profiling
+)/
+'''
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "semver"
+pattern = "^(?P<base>\\d+\\.\\d+\\.\\d+)(-?((?P<stage>[a-zA-Z]+)\\.?(?P<revision>\\d+)?))?$"
+
+[tool.pytest.ini_options]
+log_file = "pytest.log"
+log_level = "DEBUG"
+log_file_format = "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
+norecursedirs = "_build tmp*  __pycache__ src prof wheel_files"
+filterwarnings = [
+  "ignore:tostring.*is deprecated",
+  "ignore:`np.object` is a deprecated alias",
+  "ignore:`np.typeDict` is a deprecated alias for `np.sctypeDict`",
+]
 
 [tool.flakehell]
 format = "colored"
@@ -58,36 +114,8 @@ flake8-simplify = ["+*"]
 flake8-builtins = ["+*"]
 flake8-debugger = ["+*"]
 
-[tool.poetry.extras]
-parse_xml = ["lxml", "pendulum"]
-
-
-[tool.poetry-dynamic-versioning]
-enable = true
-vcs = "git"
-style = "semver"
-pattern = "^(?P<base>\\d+\\.\\d+\\.\\d+)(-?((?P<stage>[a-zA-Z]+)\\.?(?P<revision>\\d+)?))?$"
-
-[tool.isort]
-profile = "black"
-line_length = 100
-
-[tool.black]
-line-length = 100
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-  | profiling
-)/
-'''
+[tool.flakehell.exceptions."abot_opf/ptc.py"]
+flake8-simplify = ["-SIM106"]
 
 [tool.coverage.report]
 # Regexes for lines to exclude from consideration
@@ -103,20 +131,15 @@ skip_covered = true
 show_missing = true
 precision = 2
 
+[tool.vulture]
+exclude = ["docs/"]
+make_whitelist = true
+paths = ["abot_opf", "tests", "whitelist.py"]
+verbose = false
+
 [tool.coverage.run]
 branch = true
-source = ["cimsparql",  "conftest", "tests"]
-
-[tool.pytest.ini_options]
-log_file = "pytest.log"
-log_level = "DEBUG"
-log_file_format = "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
-norecursedirs = "_build tmp*  __pycache__ src prof wheel_files"
-markers = [
-  "integration: Mark test as an integration test",
-]
-filterwarnings = []
-
+source = ["abot_opf", "conftest", "tests"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
