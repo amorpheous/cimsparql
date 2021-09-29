@@ -22,7 +22,6 @@ class CimModel(Prefix, ABC):
     """Used to query with sparql queries (typically CIM)."""
 
     def __init__(self, mapper: TypeMapper, *args, **kwargs) -> None:
-        self._setup_client(*args, **kwargs)
         self.mapper = mapper
 
     @abstractmethod
@@ -41,8 +40,8 @@ class CimModel(Prefix, ABC):
                 date_version = self._date_version = date_version.astype("<M8[s]").astype(datetime)
         return date_version
 
-    @property
-    def mapper(self) -> TypeMapper:
+    #@property
+    #def mapper(self) -> TypeMapper:
         """Mapper used to convert str → type described by ontology in Graphdb
 
         Getter:
@@ -50,14 +49,14 @@ class CimModel(Prefix, ABC):
         Setter:
            Sets mapper for self. Query GraphDB if not provided (None)
         """
-        return self._mapper
+    #    return self._mapper
 
-    @mapper.setter
-    def mapper(self, mapper: Optional[TypeMapper] = None) -> None:
-        if mapper is None and "rdfs" in self.prefixes:
-            self._mapper = TypeMapper(self)
-        else:
-            self._mapper = mapper
+    #@mapper.setter
+    #def mapper(self, mapper: Optional[TypeMapper] = None) -> None:
+    #    if mapper is None and "rdfs" in self.prefixes:
+    #        self._mapper = TypeMapper(self)
+    #    else:
+    #        self._mapper = mapper
 
     def _query_with_header(self, query: str, limit: Optional[int] = None) -> str:
         query = "\n".join([self.header_str(query), query])

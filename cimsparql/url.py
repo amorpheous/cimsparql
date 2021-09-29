@@ -86,7 +86,7 @@ class Prefix:
     @property
     def cim_version(self) -> int:
         """CIM version on server/repo."""
-        return int(self.prefixes["cim"].split("CIM-schema-cim")[1])
+        return 16 #int(self.prefixes["cim"].split("CIM-schema-cim")[1])
 
     @property
     def prefixes(self) -> Dict[str, str]:
@@ -96,9 +96,9 @@ class Prefix:
     @property
     def ns(self) -> Dict[str, str]:
         """Return namespace."""
-        return {name: f"{url}#" for name, url in self.items()}
+        return {"cim" : "2013"} #{name: f"{url}#" for name, url in self.items()}
 
-    @property
-    def inverse_ns(self) -> Dict[str, str]:
+    #@property
+    #def inverse_ns(self) -> Dict[str, str]:
         """Return inverse namespace."""
-        return {f"{url}#": name for name, url in self.items()}
+    #    return {f"{url}#": name for name, url in self.items()}
